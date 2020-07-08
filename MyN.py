@@ -7,29 +7,33 @@ path = str(input("Nombre del archivo de excel SIN extension xlsx: ") + '.xlsx')
 xls = pd.ExcelFile(path)
 df = xls.parse(xls.sheet_names[0])
 df.columns = ['CANTIDAD/TIPO','TIENDA/CONTACTO','VALOR COMPRA','VALOR VENTA','VALOR COMISIÓN','GANANCIA']
-df.dropna()
 clients = int(input("Numero de clientes que tienes: "))
-def quantity(df):
+def quantity(df,clients):
 
-    countA = 0
-    countB = 0
-    countAA = 0
-    number = 0
-
-    for i in range(0,df['CANTIDAD/TIPO'].size):
-        if  re.search("^([1-9][0-9]{0,2}|1000)A$", str( df['CANTIDAD/TIPO'][i])) :
-            number = df['CANTIDAD/TIPO'][i].split('A')
-            countA += int(number[0])
-        elif  re.search("^([1-9][0-9]{0,2}|1000)B$", str( df['CANTIDAD/TIPO'][i])) :
-            number = df['CANTIDAD/TIPO'][i].split('B')
-            countB += int(number[0])
-        elif  re.search("^([1-9][0-9]{0,2}|1000)AA$", str( df['CANTIDAD/TIPO'][i])) :
-            number = df['CANTIDAD/TIPO'][i].split('AA')
-            countAA += int(number[0])
+    countA = 0.0
+    countB = 0.0
+    countAA = 0.0
+    number = 0.0
+    l = []
+    l = df['CANTIDAD/TIPO'][5::]
+    clients += 5
+    for i in range(5,clients):
+        if 'AA' in str(l[i]):
+            number = l[i].split('AA')
+            countAA += float(number[0])
+            continue
+        elif 'B' in str(l[i]):
+            number = l[i].split('B')
+            countB += float(number[0])
+            continue
+        elif 'A' in str(l[i]):
+            number = l[i].split('A')
+            countA += float(number[0])
+            continue
     
     return countA,countB,countAA
 
-quantity(df)
+quantity(df,clients)
 def buy_value(df,clients):
     buy_value = 0
     clients += 5
@@ -74,9 +78,10 @@ def stores(df):
         array.append(str(df['TIENDA/CONTACTO'][i]))
     return array
 
-def gain(df):
+def gain(df,clients):
 
     array = []
+    clients += 6
     for i in range(5,df['VALOR VENTA'].size):
         df['VALOR COMPRA'][i] =  str(df['VALOR COMPRA'][i])
         df['VALOR VENTA'][i]  =  str(df['VALOR VENTA'][i])
@@ -84,8 +89,10 @@ def gain(df):
 
         if  'nan' in df['VALOR VENTA'][i]:
             continue
+            
         if 'nan' in df['VALOR COMPRA'][i]:
             continue
+            
         if 'nan' in df['VALOR COMISIÓN'][i]:
             continue
         else:
@@ -93,7 +100,7 @@ def gain(df):
     return array
 
 a = stores(df)
-arr = gain(df)
+arr = gain(df,clients)
 def value_gain(arr):
     aux = list(arr)
     count = 0
@@ -105,7 +112,7 @@ l = []
 value = value_gain(arr)
 l.append('$'+str(value))
 
-amountA,amountB,amountAA = quantity(df)
+amountA,amountB,amountAA = quantity(df,clients)
 data = {
         'TIPO':                         ['Huevo A', 'Huevo B','Huevo AA'],
         'CANTIDADADES  TOTALES':        [str(amountA)  ,  str(amountB) , str(amountAA) ],
